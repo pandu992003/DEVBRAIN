@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "DevBrain Collector",
+    "version": "1.0",
+    "description": "Automatically syncs your developer learning history to DevBrain.",
+    "permissions": [
+        "history",
+        "tabs",
+        "storage",
+        "webNavigation"
+    ],
+    "host_permissions": [
+        "http://127.0.0.1:8001/*",
+        "<all_urls>"
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    }
+}

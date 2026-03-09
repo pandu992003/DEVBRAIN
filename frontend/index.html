@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevBrain — Personal Learning OS for Developers</title>
+  <meta name="description"
+    content="DevBrain is your personal learning operating system. Automatically track everything you learn across GitHub, YouTube, blogs and docs — and turn it into a real skill graph." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+  <!-- Auth Screen -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-bg">
+      <div class="auth-orb auth-orb-1"></div>
+      <div class="auth-orb auth-orb-2"></div>
+      <div class="auth-orb auth-orb-3"></div>
+    </div>
+    <div class="auth-container">
+      <div class="auth-logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">DevBrain</span>
+      </div>
+      <p class="auth-tagline">Your Personal Learning OS</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <div id="login-error" class="form-error hidden"></div>
+        <button type="submit" class="btn-primary btn-full" id="login-btn">
+          <span>Sign In</span>
+          <span class="btn-arrow">→</span>
+        </button>
+        <p class="auth-demo-hint">
+          No account? Use <strong>demo@devbrain.dev</strong> / <strong>demo1234</strong> or register.
+        </p>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form hidden" onsubmit="handleRegister(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="reg-username" placeholder="johndoe" required minlength="3" />
+          </div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="reg-fullname" placeholder="John Doe" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="reg-email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="min. 8 characters" required minlength="8" />
+        </div>
+        <div id="reg-error" class="form-error hidden"></div>
+        <button type="submit" class="btn-primary btn-full" id="reg-btn">
+          <span>Create Account</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text sidebar-logo-text">DevBrain</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" id="nav-overview" onclick="showSection('overview', this)">
+          <span class="nav-icon">⊹</span>
+          <span class="nav-label">Overview</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-skills" onclick="showSection('skills', this)">
+          <span class="nav-icon">◈</span>
+          <span class="nav-label">Skills</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-events" onclick="showSection('events', this)">
+          <span class="nav-icon">◎</span>
+          <span class="nav-label">Events</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-recommendations" onclick="showSection('recommendations', this)">
+          <span class="nav-icon">◇</span>
+          <span class="nav-label">Recommended</span>
+        </a>
+        <a href="#" class="nav-item" id="nav-ingest" onclick="showSection('ingest', this)">
+          <span class="nav-icon">⊕</span>
+          <span class="nav-label">Add Learning</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="user-avatar" id="sidebar-avatar">JS</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-username">Loading…</div>
+            <div class="user-role">Developer</div>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="logout()" title="Logout">⎋</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 class="page-title" id="page-title">Overview</h1>
+          <span class="page-subtitle" id="page-subtitle">Your learning at a glance</span>
+        </div>
+        <div class="header-right">
+          <div class="header-streak" id="header-streak">
+            <span class="streak-icon">🔥</span>
+            <span id="streak-count">0</span>
+            <span class="streak-label">day streak</span>
+          </div>
+          <div class="header-score" id="header-score">
+            <span class="score-value" id="overall-score-header">0</span>
+            <span class="score-label">skill score</span>
+          </div>
+          <button class="refresh-btn" onclick="loadAllData()" title="Refresh">↻</button>
+        </div>
+      </header>
+
+      <!-- ─── Section: Overview ───────────────────────────────── -->
+      <section id="section-overview" class="section active">
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+          <div class="stat-card glass" id="stat-total">
+            <div class="stat-icon stat-icon-blue">◎</div>
+            <div class="stat-body">
+              <div class="stat-value" id="stat-events">0</div>
+              <div class="stat-label">Total Events</div>
+            </div>
+            <div class="stat-trend up" id="stat-week">+0 this week</div>
+          </div>
+          <div class="stat-card glass" id="stat-domains">
+            <div class="stat-icon stat-icon-purple">◈</div>
+            <div class="stat-body">
+              <div class="stat-value" id="stat-active-domains">0</div>
+              <div class="stat-label">Active Domains</div>
+            </div>
+            <div class="stat-trend" id="stat-top-tech">—</div>
+          </div>
+          <div class="stat-card glass" id="stat-score-card">
+            <div class="stat-icon stat-icon-green">⬡</div>
+            <div class="stat-body">
+              <div class="stat-value" id="stat-overall-score">0</div>
+              <div class="stat-label">Overall Score</div>
+            </div>
+            <div class="stat-trend" id="stat-level">Novice</div>
+          </div>
+          <div class="stat-card glass" id="stat-sources-card">
+            <div class="stat-icon stat-icon-orange">⊹</div>
+            <div class="stat-body">
+              <div class="stat-value" id="stat-sources">0</div>
+              <div class="stat-label">Data Sources</div>
+            </div>
+            <div class="stat-trend" id="stat-sources-list">Connect sources</div>
+          </div>
+        </div>
+
+        <!-- Activity Chart + Top Skills -->
+        <div class="two-col-grid">
+          <div class="glass-card">
+            <div class="card-header">
+              <h2 class="card-title">Learning Activity</h2>
+              <span class="card-subtitle">Last 30 days</span>
+            </div>
+            <div class="activity-chart" id="activity-chart">
+              <div class="chart-empty">No activity yet — start adding learning events!</div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-header">
+              <h2 class="card-title">Top Skills</h2>
+              <a href="#" onclick="showSection('skills', document.getElementById('nav-skills'))" class="card-link">View
+                all →</a>
+            </div>
+            <div class="top-skills-list" id="top-skills-list">
+              <div class="empty-state">No skills tracked yet</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Events -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Learning Events</h2>
+            <a href="#" onclick="showSection('events', document.getElementById('nav-events'))" class="card-link">See all
+              →</a>
+          </div>
+          <div class="recent-events-list" id="recent-events-list">
+            <div class="empty-state">No events yet — add your first learning event!</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section: Skills ────────────────────────────────── -->
+      <section id="section-skills" class="section hidden">
+        <div class="glass-card" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <h2 class="card-title">Skill Graph</h2>
+            <span class="card-subtitle" id="skills-subtitle">Loading…</span>
+          </div>
+          <div id="skill-graph-container" class="skill-graph-container">
+            <div class="empty-state">No skills tracked yet. Start adding learning events!</div>
+          </div>
+        </div>
+
+        <!-- Skill Gaps -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h2 class="card-title">Gap Analysis</h2>
+            <span class="card-subtitle">Areas to improve</span>
+          </div>
+          <div id="gaps-container" class="gaps-container">
+            <div class="empty-state">No gaps identified yet</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section: Events ────────────────────────────────── -->
+      <section id="section-events" class="section hidden">
+        <div class="glass-card">
+          <div class="card-header">
+            <h2 class="card-title">All Knowledge Events</h2>
+            <button class="btn-secondary" onclick="showSection('ingest', document.getElementById('nav-ingest'))">+ Add
+              Event</button>
+          </div>
+          <div id="events-table-container">
+            <div class="empty-state">No events yet</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Section: Recommendations ──────────────────────── -->
+      <section id="section-recommendations" class="section hidden">
+        <div class="recs-grid" id="recs-container">
+          <div class="empty-state">Loading recommendations…</div>
+        </div>
+      </section>
+
+      <!-- ─── Section: Add Learning Event ──────────────────── -->
+      <section id="section-ingest" class="section hidden">
+        <div class="glass-card ingest-card">
+          <div class="card-header">
+            <h2 class="card-title">Log a Learning Event</h2>
+            <span class="card-subtitle">Tell DevBrain what you learned</span>
+          </div>
+          <form id="ingest-form" onsubmit="handleIngest(event)" class="ingest-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Topic <span class="required">*</span></label>
+                <input type="text" id="ingest-topic" placeholder="e.g. React Hooks" required />
+              </div>
+              <div class="form-group">
+                <label>Technology</label>
+                <input type="text" id="ingest-technology" placeholder="e.g. React" list="tech-suggestions" />
+                <datalist id="tech-suggestions">
+                  <option value="React" />
+                  <option value="TypeScript" />
+                  <option value="Python" />
+                  <option value="FastAPI" />
+                  <option value="Django" />
+                  <option value="Node.js" />
+                  <option value="PostgreSQL" />
+                  <option value="Docker" />
+                  <option value="Kubernetes" />
+                  <option value="PyTorch" />
+                  <option value="TensorFlow" />
+                  <option value="SQL" />
+                  <option value="Next.js" />
+                  <option value="Vue" />
+                  <option value="Go" />
+                </datalist>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Domain <span class="required">*</span></label>
+                <select id="ingest-domain" required>
+                  <option value="">Select domain…</option>
+                  <option value="Frontend">Frontend</option>
+                  <option value="Backend">Backend</option>
+                  <option value="DevOps">DevOps</option>
+                  <option value="Data">Data Engineering</option>
+                  <option value="AI/ML">AI / ML</option>
+                  <option value="Mobile">Mobile</option>
+                  <option value="Security">Security</option>
+                  <option value="System Design">System Design</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Concept / Sub-topic</label>
+                <input type="text" id="ingest-concept" placeholder="e.g. useEffect cleanup" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Source</label>
+                <select id="ingest-source">
+                  <option value="manual">Manual Entry</option>
+                  <option value="browser">Browser / Article</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="github">GitHub</option>
+                  <option value="notes">Notes</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Depth</label>
+                <select id="ingest-depth">
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Source URL (optional)</label>
+                <input type="url" id="ingest-url" placeholder="https://..." />
+              </div>
+              <div class="form-group">
+                <label>Confidence <span id="confidence-label">50%</span></label>
+                <input type="range" id="ingest-confidence" min="0" max="100" value="50"
+                  oninput="document.getElementById('confidence-label').textContent = this.value + '%'" />
+              </div>
+            </div>
+            <div id="ingest-success" class="form-success hidden">✓ Event logged and skill graph updated!</div>
+            <div id="ingest-error" class="form-error hidden"></div>
+            <button type="submit" class="btn-primary" id="ingest-btn">
+              <span>Log Learning Event</span>
+              <span class="btn-arrow">→</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Quick Bulk Add -->
+        <div class="glass-card" style="margin-top: 1.5rem;">
+          <div class="card-header">
+            <h2 class="card-title">Quick Add — Common Technologies</h2>
+            <span class="card-subtitle">Click to log a learning session</span>
+          </div>
+          <div class="quick-add-grid" id="quick-add-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- DevBrain AI Chatbot Widget -->
+    <div id="chatbot-widget" class="chatbot-widget collapsed">
+      <div class="chatbot-header" onclick="toggleChatbot()">
+        <span>DevBrain AI</span>
+        <span class="chatbot-toggle-icon">💬</span>
+      </div>
+      <div class="chatbot-body" id="chatbot-messages">
+        <div class="chat-message ai-message">
+          Hi! I'm DevBrain AI. I have full access to your Snowflake learning data. Ask me anything about your progress!
+        </div>
+      </div>
+      <div class="chatbot-input">
+        <input type="text" id="chat-input" placeholder="Ask about your skills..." onkeypress="handleChatEnter(event)" />
+        <button onclick="sendChatMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+
+</html>

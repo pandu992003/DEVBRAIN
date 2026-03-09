@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            width: 300px;
+            padding: 15px;
+            font-family: 'Segoe UI', sans-serif;
+            background: #0b1120;
+            color: white;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            color: #38bdf8;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #0ea5e9;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0284c7;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #logout-view {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="login-view">
+        <h2>DevBrain Login</h2>
+        <input type="email" id="email" placeholder="Email (testuser@devbrain.dev)">
+        <input type="password" id="pass" placeholder="Password (password123)">
+        <button id="login-btn">Secure Connect</button>
+    </div>
+
+    <div id="logout-view">
+        <h2>DevBrain Active ⬡</h2>
+        <p style="font-size: 0.9rem; color: #94a3b8;">Capturing learning events...</p>
+        <button id="logout-btn" style="background: #ef4444;">Disconnect</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <script src="popup.js"></script>
+</body>
+
+</html>
