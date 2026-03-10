@@ -1,0 +1,311 @@
+The **Skill Scoring Engine** is the core logic that converts a single learning event (like reading docs or watching a tutorial) into a **numeric skill gain**. Each event is evaluated using several factors that represent how meaningful that learning activity is. The engine multiplies these factors together to produce an **event score**, which is then added to the user’s concept score using a diminishing-returns formula.
+
+---
+
+# Skill Scoring Engine — How It Works
+
+When a relevant learning event arrives, the engine calculates:
+
+```
+event_score =
+confidence
+× depth_weight
+× activity_weight
+× engagement_factor
+× recency_decay
+× difficulty_weight
+× base_multiplier
+```
+
+This result represents **how much the user improved from that event**.
+
+Example:
+
+```
+confidence = 0.9
+depth_weight = 0.8
+activity_weight = 1.0
+engagement_factor = 0.7
+recency_decay = 0.95
+difficulty_weight = 1.1
+base_multiplier = 15
+
+event_score ≈ 7.9
+```
+
+This means the event adds **~7.9 learning points** to that concept.
+
+---
+
+# Explanation of Each Factor
+
+## 1. Confidence Score
+
+Confidence measures **how certain the AI classifier is about the topic classification**.
+
+Range:
+
+```
+0.0 → uncertain
+1.0 → very confident
+```
+
+Example:
+
+```
+Page: "React Hooks Documentation"
+confidence = 0.95
+```
+
+If the AI is unsure:
+
+```
+confidence = 0.6
+```
+
+Lower confidence reduces the score because the system is less sure about the learning signal.
+
+---
+
+# 2. Depth Weight
+
+Depth represents **how advanced the learning material is**.
+
+Example mapping:
+
+```
+Beginner      → 0.4
+Intermediate  → 0.7
+Advanced      → 1.0
+```
+
+Example:
+
+```
+"Python Basics Tutorial"
+depth = beginner → 0.4
+```
+
+```
+"Async Programming in Python"
+depth = advanced → 1.0
+```
+
+Advanced material gives more score because it usually requires deeper understanding.
+
+---
+
+# 3. Activity Type Weight
+
+Different activities show **different levels of learning effort**.
+
+Example weights:
+
+```
+Browsing page        → 0.3
+Reading documentation → 0.8
+Watching tutorial     → 0.6
+Coding / GitHub work  → 1.2
+```
+
+Example:
+
+```
+Reading AWS docs
+activity_weight = 0.8
+```
+
+```
+Writing code in GitHub repo
+activity_weight = 1.2
+```
+
+Coding activity increases skill more than passive browsing.
+
+---
+
+# 4. Engagement Score
+
+Engagement measures **how long or deeply the user interacted with the content**.
+
+Example scale:
+
+```
+0.5 → short visit
+0.7 → moderate engagement
+0.9 → deep learning session
+```
+
+Example:
+
+```
+User reads documentation for 30 seconds
+engagement = 0.5
+```
+
+```
+User watches a 20-minute tutorial
+engagement = 0.9
+```
+
+Higher engagement increases the score.
+
+---
+
+# 5. Recency Decay
+
+Recent learning is more important than old learning.
+
+The system applies a **time decay function**:
+
+```
+recency = e^(-days_old / decay_rate)
+```
+
+Example:
+
+```
+Today event → 1.0
+1 week old → 0.95
+1 month old → 0.80
+```
+
+Example:
+
+```
+User studied Python yesterday
+recency = 0.98
+```
+
+Old events gradually lose impact.
+
+---
+
+# 6. Difficulty Weight
+
+Some topics are harder to learn.
+
+Example:
+
+```
+Easy concept      → 0.9
+Medium concept    → 1.0
+Hard concept      → 1.1
+```
+
+Example:
+
+```
+Topic: Python variables
+difficulty = 0.9
+```
+
+```
+Topic: Distributed Systems
+difficulty = 1.1
+```
+
+Harder topics slightly boost the score.
+
+---
+
+# Final Event Score Example
+
+Suppose the user reads an AWS SageMaker documentation page.
+
+```
+confidence = 0.95
+depth = intermediate → 0.7
+activity = reading_docs → 0.8
+engagement = 0.6
+recency = 1.0
+difficulty = 1.1
+base_multiplier = 15
+```
+
+Calculation:
+
+```
+event_score =
+0.95 × 0.7 × 0.8 × 0.6 × 1.0 × 1.1 × 15
+
+≈ 5.2 points
+```
+
+So the **Amazon SageMaker concept score increases by ~5.2 points**.
+
+---
+
+# Diminishing Returns (Very Important)
+
+Instead of simply adding the score, the system slows growth when mastery increases.
+
+Formula:
+
+```
+new_score =
+old_score + event_score × (1 − old_score / 100)
+```
+
+Example:
+
+If user is beginner:
+
+```
+old_score = 10
+event_score = 5
+
+new_score = 14.5
+```
+
+If user is expert:
+
+```
+old_score = 90
+event_score = 5
+
+new_score = 90.5
+```
+
+This prevents skill inflation.
+
+---
+
+# Hierarchical Score Update
+
+Once the concept score updates, it propagates upward.
+
+Example:
+
+```
+Concept: Python Decorators → 60
+Concept: Generators → 40
+Concept: Async → 30
+```
+
+Technology score:
+
+```
+Python = average(60,40,30) = 43
+```
+
+Domain score:
+
+```
+Backend = average(Python, NodeJS, Databases)
+```
+
+---
+
+# Final Summary
+
+The **Skill Scoring Engine converts learning activities into skill growth** by combining multiple signals:
+
+* confidence → AI classification certainty
+* depth → difficulty level of material
+* activity_type → effort level of activity
+* engagement → time spent learning
+* recency → how recent the event is
+* difficulty → concept complexity
+
+These factors generate an **event score**, which updates the user’s concept score using **diminishing returns**, and then propagates upward to **technology and domain skill levels**.
