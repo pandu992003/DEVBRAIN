@@ -1,0 +1,269 @@
+Your diagram is already good, but I’ll convert it into a **clean workflow explanation** so you can easily **explain it in documentation, interviews, or presentations**. Think of it as a **step-by-step workflow pipeline** of how DevBrain works.
+
+---
+
+# DevBrain Complete Workflow Diagram (Explained)
+
+```
+User Browsing
+     │
+     ▼
+Chrome Extension
+     │
+     │ 1. Capture page activity
+     │ (URL, title, timestamp)
+     ▼
+Local Privacy Filter
+     │
+     ├── Invalid pages
+     │     (chrome:// , blank tabs)
+     │        ↓
+     │     Ignored
+     │
+     └── Valid developer content
+            │
+            ▼
+POST /api/events/browser
+(FastAPI Backend)
+            │
+            ▼
+AI Classification Service
+            │
+            ▼
+LLM Model (OpenRouter)
+            │
+            ▼
+Classification Output
+{
+topic,
+technology,
+domain,
+activity_type,
+depth,
+confidence,
+engagement_score,
+is_relevant
+}
+            │
+            ▼
+Relevance Check
+            │
+     ├── If NOT relevant
+     │       ↓
+     │   Event dropped
+     │
+     └── If relevant
+            │
+            │
+            ├───────────────► Path A: Data Warehouse
+            │
+            │
+            ▼
+Path B: Local Skill Engine
+```
+
+---
+
+# Path A — Snowflake Analytics Pipeline
+
+This path builds the **analytics system**.
+
+```
+Backend Event
+     │
+     ▼
+Snowflake Connector
+     │
+     ▼
+Bronze Layer
+raw_events
+(raw JSON storage)
+     │
+     ▼
+Silver Layer
+knowledge_events
+(clean structured data)
+     │
+     ▼
+Gold Layer
+Analytics Tables
+     │
+     ├ learning_activity_daily
+     ├ technology_trends
+     └ learning_velocity
+     │
+     ▼
+Analytics API
+/api/analytics/*
+     │
+     ▼
+Frontend Dashboard Charts
+```
+
+Purpose of this pipeline:
+
+```
+Long-term analytics
+Learning trends
+Technology popularity
+Activity patterns
+```
+
+---
+
+# Path B — Local Skill Intelligence Engine
+
+This path updates the **user’s skill graph in real time**.
+
+```
+Relevant Event
+     │
+     ▼
+Event Deduplication
+(prevent repeated spam clicks)
+     │
+     ▼
+Skill Scoring Engine
+     │
+     │ Calculates:
+     │
+     │ confidence
+     │ depth
+     │ engagement
+     │ difficulty
+     │ activity_type
+     │ recency_decay
+     │
+     ▼
+Concept Score Update
+(e.g., Python Decorators)
+     │
+     ▼
+Technology Score Update
+(e.g., Python)
+     │
+     ▼
+Domain Score Update
+(e.g., Backend)
+     │
+     ▼
+SQLite Database
+user_skills table
+```
+
+Purpose:
+
+```
+Real-time skill tracking
+Concept mastery
+Technology strength
+Domain expertise
+```
+
+---
+
+# Final Dashboard Data Flow
+
+The dashboard receives **two types of data**.
+
+```
+Frontend Dashboard
+        │
+        │
+        ├────────────► GET /api/skills
+        │                 │
+        │                 ▼
+        │           SQLite Skill Graph
+        │
+        │
+        └────────────► GET /api/analytics/*
+                          │
+                          ▼
+                     Snowflake Gold Tables
+```
+
+So:
+
+```
+SQLite → Personal skill graph
+Snowflake → Analytics insights
+```
+
+---
+
+# Full DevBrain System Architecture (Simplified)
+
+```
+Browser Extension
+        │
+        ▼
+FastAPI Backend
+        │
+        ▼
+AI Classification
+        │
+        ▼
+Relevant Event
+        │
+   ┌────┴─────┐
+   │          │
+   ▼          ▼
+SQLite      Snowflake
+Skill       Data Warehouse
+Engine      (Bronze→Silver→Gold)
+   │          │
+   ▼          ▼
+Skill Graph  Analytics
+   │          │
+   └─────┬────┘
+         ▼
+   Dashboard UI
+```
+
+---
+
+# Key Idea of DevBrain Architecture
+
+DevBrain has **two parallel intelligence systems**:
+
+### 1️⃣ Real-Time Intelligence
+
+```
+SQLite Skill Engine
+```
+
+Used for:
+
+* skill scores
+* recommendations
+* skill gaps
+* concept mastery
+
+---
+
+### 2️⃣ Data Warehouse Intelligence
+
+```
+Snowflake Analytics
+```
+
+Used for:
+
+* learning trends
+* technology popularity
+* activity analysis
+* long-term data insights
+
+---
+
+# One Sentence Explanation (for interviews)
+
+You can explain your project like this:
+
+> DevBrain captures developer browsing activity through a browser extension, classifies it using an LLM, updates a real-time skill graph in SQLite, and simultaneously streams raw events into a Snowflake data warehouse where a Bronze–Silver–Gold pipeline generates long-term analytics displayed in the dashboard.
+
+That explanation is **very strong technically**.
+
+---
+
+If you want, I can also show you **one final architectural improvement that would make DevBrain look like a real Silicon Valley data platform** (it involves event streaming).
